@@ -1,0 +1,22 @@
+{
+  "name": "cuppers_back",
+  "version": "1.0.0",
+  "description": "web server for cuppers'",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Resister-boy/cuppers_back.git"
+  },
+  "author": "team_cuppers'",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Resister-boy/cuppers_back/issues"
+  },
+  "homepage": "https://github.com/Resister-boy/cuppers_back#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
