@@ -3,8 +3,13 @@ const router = express.Router();
 const mysql = require("../mysql");
 
 router.get("/", async (req, res) => {
-  //   const cafeList = await mysql.query("cafeList");
-  //   res.send(cafeList);
+  const userList = await mysql.query("userList");
+  res.send(userList);
+});
+
+router.post("/", async (req, res) => {
+  const result = await mysql.query("userCreate", req.body.param);
+  res.send(result);
 });
 
 module.exports = router;
