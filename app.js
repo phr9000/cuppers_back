@@ -9,10 +9,16 @@ app.use(
   })
 );
 
-app.get("/api/cafe", async (req, res) => {
-  const cafeList = await mysql.query("cafeList");
-  res.send(cafeList);
-});
+// app.get("/api/cafe", async (req, res) => {
+//   const cafeList = await mysql.query("cafeList");
+//   res.send(cafeList);
+// });
+
+const cafeRoutes = require("./routes/cafe");
+app.use("/api/cafe", cafeRoutes);
+
+const userRoutes = require("./routes/user");
+app.use("/api/user", userRoutes);
 
 app.listen(3000, () => {
   console.log("3000번 포트에서 서버가 시작되었습니다.");
