@@ -62,7 +62,7 @@ router.get("/:cafe_id", async (req, res) => {
   const likeIt = await mysql.query("cafeLikeIt", cafe_id);
   cafeDetail[0].likeIt = likeIt[0];
 
-  res.send(cafeDetail);
+  res.send(cafeDetail[0]);
 });
 
 // router.get("/update", async (req, res) => {

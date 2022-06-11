@@ -23,6 +23,9 @@ app.use("/api/user", userRoutes);
 const reviewRoutes = require("./routes/review");
 app.use("/api/review", reviewRoutes);
 
+const keywordRoutes = require("./routes/keyword");
+app.use("/api/keyword", keywordRoutes);
+
 app.listen(3000, () => {
   console.log("3000번 포트에서 서버가 시작되었습니다.");
 });
