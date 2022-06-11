@@ -24,6 +24,15 @@ module.exports = {
   cafeLikeIt: `SELECT COUNT(*) as count
   FROM user_cafe_likeit
   WHERE cafe_id = ?`,
+  cafeReview: `SELECT t1.*, t2.user_nickname, 
+  (
+    SELECT COUNT(*) 
+    FROM user_review_likeit
+    WHERE user_review_likeit.review_id = t1.review_id
+    ) as likeit
+ 
+  FROM review t1, user t2
+  WHERE t1.cafe_id = ? and t1.user_id = t2.user_id`,
   userList: `select * from user`,
   userCreate: `insert into user set ?`,
 };
