@@ -7,6 +7,7 @@ router.get("/", async (req, res) => {
   res.send(userList);
 });
 
+//
 router.post("/", async (req, res) => {
   const result = await mysql.query("userCreate", req.body.param);
   res.send(result);
