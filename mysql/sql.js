@@ -48,4 +48,21 @@ module.exports = {
   userCreate: `insert into user set ?`,
   // keyword 연결된 커핑노트 새 글 있을 때 new : T 전달하도록 query 수정
   keywordLanding: `SELECT keyword_id, keyword_name, keyword_icon FROM keyword WHERE keyword_islanding=1`,
+  cnoteDetail: `SELECT *, 
+  (
+    SELECT COUNT(*) 
+    FROM user_cnote_likeit t2
+    WHERE t2.cnote_id = t1.cnote_id
+    ) as likeit,
+    (
+      SELECT COUNT(*) 
+    FROM user_cnote_bookmark t3
+    WHERE t3.cnote_id = t1.cnote_id
+    ) as reviews
+    From cnote t1
+    WHERE t1.cnote_id = ?`,
+  cnoteImg: `SELECT * FROM images_cnote t1 WHERE t1.cnote_id = ?`,
+  cnoteUser: `SELECT t2.user_id, t2.user_introduce, t2.user_nickname, t2.user_thumbnail_url
+  FROM cnote t1, user t2
+  WHERE t1.cnote_id = ? and t1.user_id = t2.user_id`,
 };
