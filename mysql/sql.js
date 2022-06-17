@@ -46,15 +46,17 @@ module.exports = {
   cafeFacility: `SELECT t3.facility_name as name, t3.facility_icon as icon, t3.facility_type as type
   FROM cafe t1, cafe_facility t2, facility t3
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.facility_id = t3.facility_id`,
-  cafeReview: `SELECT t1.*, t2.user_nickname, t3.images_review_url as thumbnail_url,
+  cafeReview: `SELECT t1.*, t2.user_nickname, 
   (
     SELECT COUNT(*) 
-    FROM user_review_likeit t4
-    WHERE t4.review_id = t1.review_id
-    ) as likeit
- 
-  FROM review t1, user t2, images_review t3
-  WHERE t1.cafe_id = ? and t1.user_id = t2.user_id and t1.review_id = t3.review_id and t3.isthumbnail = 1`,
+    FROM user_review_likeit t3
+    WHERE t3.review_id = t1.review_id
+    ) as likeit 
+  FROM review t1, user t2
+  WHERE t1.cafe_id = ? and t1.user_id = t2.user_id`,
+  reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
+  FROM review t1, review_keyword t2, keyword t3
+  WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
   userList: `select * from user`,
   userCreate: `insert into user set ?`,
   // keyword 연결된 커핑노트 새 글 있을 때 new : T 전달하도록 query 수정
