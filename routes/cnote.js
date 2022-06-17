@@ -23,4 +23,29 @@ router.get("/user/:cnote_id", async (req, res) => {
   res.send(cnoteUser);
 });
 
+/////// 커핑노트 등록 시 필요한 api ////////
+// [조회] 일반 카페 목록 api
+router.get("/", async (req, res) => {
+  const cafeListOnly = await mysql.query("cafeListOnly");
+  res.send(cafeListOnly);
+});
+
+// [조회] 유저 아이디로 마이카페리스트 이름 조회 api
+router.get("/mycafelist/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  const cnoteMyList = await mysql.query("cnoteMyList", user_id);
+  res.json(cnoteMyList);
+});
+
+// [조회] 마이 카페리스트 체크해서 카페 이름 부르기 api
+router.get("/mycafelist/:cafe_id", async (req, res) => {
+  const { user_id } = req.params;
+  const cnoteMylist = await mysql.query("cnoteMylist", user_id);
+  res.send(cnoteMylist);
+});
+
+// [생성] cnote 테이블에 일반정보 저장 api
+
+// [업데이트] cnote id 생성 후 cafe id들 저장 업데이트 api
+
 module.exports = router;

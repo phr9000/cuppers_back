@@ -78,4 +78,7 @@ module.exports = {
   cnoteUser: `SELECT t2.user_id, t2.user_introduce, t2.user_nickname, t2.user_thumbnail_url
   FROM cnote t1, user t2
   WHERE t1.cnote_id = ? and t1.user_id = t2.user_id`,
+  cafeListOnly: `SELECT t1.* from cafe`,
+  cnoteMyList: `select t1.* from mylist t1 where t1.user_id = ?`,
+  myListCafeList: `select `,
 };
