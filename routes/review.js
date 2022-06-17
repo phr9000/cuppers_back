@@ -6,6 +6,13 @@ const mysql = require("../mysql");
 router.get("/:cafe_id", async (req, res) => {
   const { cafe_id } = req.params;
   const cafeReview = await mysql.query("cafeReview", cafe_id);
+  const reviewKeyword = await mysql.query("reviewKeyword", cafe_id);
+
+  cafeReview.forEach((review) => {
+    const temp_id = review.review_id;
+    review.review_keyword = [];
+    reviewKeyword.filter((obj) => obj.review_id === temp_id);
+  });
 
   res.send(cafeReview);
 });
