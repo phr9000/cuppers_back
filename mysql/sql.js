@@ -69,7 +69,7 @@ module.exports = {
       SELECT COUNT(*) 
     FROM user_cnote_bookmark t3
     WHERE t3.cnote_id = t1.cnote_id
-    ) as reviews
+    ) as bookmark
     From cnote t1
     WHERE t1.cnote_id = ?`,
   cnoteImg: `SELECT * FROM images_cnote t1 WHERE t1.cnote_id = ?`,
