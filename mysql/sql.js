@@ -11,13 +11,23 @@ module.exports = {
     WHERE t3.cafe_id = t1.cafe_id
     ) as reviews
   FROM cafe t1
+  WHERE cafe_region LIKE ? 
   LIMIT 10`,
-  cafeListKeyword: `SELECT t1.cafe_id, t3.keyword_id, t3.keyword_name
-  FROM cafe t1, cafe_keyword t2, keyword t3
-  WHERE t1.cafe_id = t2.cafe_id and t2.keyword_id = t3.keyword_id`,
-  cafeListOpTime: `SELECT t2.cafe_id, t2.operation_day as day, t2.operation_time as time
-  FROM cafe t1, cafe_operation_time t2
-  WHERE t1.cafe_id = t2.cafe_id`,
+  cafeListKeyword: `SELECT t1.cafe_id, t2.keyword_id, t2.keyword_name
+  FROM cafe_keyword t1, keyword t2
+  WHERE t1.cafe_id in (SELECT * FROM
+    (SELECT cafe_id
+    FROM cafe
+    WHERE cafe_region LIKE ?
+    LIMIT 10) as t)
+   and t1.keyword_id = t2.keyword_id`,
+  cafeListOpTime: `SELECT cafe_id, operation_day as day, operation_time as time
+  FROM cafe_operation_time
+  WHERE cafe_id in (SELECT * FROM
+    (SELECT cafe_id
+      FROM cafe
+      WHERE cafe_region LIKE ?
+      LIMIT 10) as t)`,
   cafeDetail: `SELECT *,
   (
     SELECT COUNT(*) 
