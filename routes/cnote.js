@@ -24,28 +24,36 @@ router.get("/user/:cnote_id", async (req, res) => {
 });
 
 /////// 커핑노트 등록 시 필요한 api ////////
-// [조회] 일반 카페 목록 api
+// [검색] 일반 카페 목록 api
 router.get("/", async (req, res) => {
   const cafeListOnly = await mysql.query("cafeListOnly");
   res.send(cafeListOnly);
 });
 
-// [조회] 유저 아이디로 마이카페리스트 이름 조회 api
-router.get("/mycafelist/:user_id", async (req, res) => {
+// [조회] 유저 아이디로 마이카페리스트 조회 api
+router.get("/cnotemylist/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  const cnoteMyList = await mysql.query("cnoteMyList", user_id);
-  res.json(cnoteMyList);
+  const mylist = await mysql.query("mylist", user_id);
+  res.json(mylist);
 });
 
-// [조회] 마이 카페리스트 체크해서 카페 이름 부르기 api
-router.get("/mycafelist/:cafe_id", async (req, res) => {
-  const { user_id } = req.params;
-  const cnoteMylist = await mysql.query("cnoteMylist", user_id);
-  res.send(cnoteMylist);
+// [조회] 위에서 받아온 마이카페리스트 pk(mylist_id)이용, 카페 이름 부르기 api
+router.get("/mylistcafename/:mylist_id", async (req, res) => {
+  const { mylist_id } = req.params;
+  const myListCafeName = await mysql.query("myListCafeName", mylist_id);
+  res.json(myListCafeName);
 });
 
 // [생성] cnote 테이블에 일반정보 저장 api
-
-// [업데이트] cnote id 생성 후 cafe id들 저장 업데이트 api
+router.post("/", async (req, res) => {
+  const cnoteCreate = await mysql.query("cnoteCreate", req.body.param);
+  res.send(cnoteCreate);
+});
+// [생성] cnote id 생성 동시에 cnote_cafe에 생성된 cnote_id, 받아온 카페 id 저장 api
+// TODO: 6/18 실제로 되는지는 프론트에서 params 라우터에 넘겨서 확인해야 됨!
+router.post("/", async (req, res) => {
+  const cnoteCafeCreate = await mysql.query("cnoteCafeCreate", req.body.param);
+  res.send(cnoteCafeCreate);
+});
 
 module.exports = router;

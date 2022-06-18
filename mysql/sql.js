@@ -57,7 +57,7 @@ module.exports = {
   reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
   FROM review t1, review_keyword t2, keyword t3
   WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
-  userList: `select * from user`,
+  userList: `select * FROM user`,
   userCreate: `insert into user set ?`,
   // keyword 연결된 커핑노트 새 글 있을 때 new : T 전달하도록 query 수정
   keywordLanding: `SELECT keyword_id, keyword_name, keyword_icon FROM keyword WHERE keyword_islanding=1`,
@@ -72,13 +72,15 @@ module.exports = {
     FROM user_cnote_bookmark t3
     WHERE t3.cnote_id = t1.cnote_id
     ) as bookmark
-    From cnote t1
+    FROM cnote t1
     WHERE t1.cnote_id = ?`,
   cnoteImg: `SELECT * FROM images_cnote t1 WHERE t1.cnote_id = ?`,
   cnoteUser: `SELECT t2.user_id, t2.user_introduce, t2.user_nickname, t2.user_thumbnail_url
   FROM cnote t1, user t2
   WHERE t1.cnote_id = ? and t1.user_id = t2.user_id`,
   cafeListOnly: `SELECT t1.* from cafe`,
-  cnoteMyList: `select t1.* from mylist t1 where t1.user_id = ?`,
-  myListCafeList: `select `,
+  myList: `SELECT t1.* from mylist t1 WHERE t1.user_id = ?`,
+  myListCafeName: `SELECT t2.cafe_id, t2.cafe_name_pr FROM cafe t2 WHERE t2.cafe_id in (SELECT t1.cafe_id FROM mylist_cafe t1 where t1.mylist_id = ?)`,
+  cnoteCreate: `insert into cnote set ?`,
+  cnoteCafeCreate: `insert into cnote_cafe set ?`,
 };
