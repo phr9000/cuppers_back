@@ -4,19 +4,14 @@ const mysql = require("../mysql");
 
 // [조회] cafe 리스트
 router.get("/", async (req, res) => {
-  const cafeList = await mysql.query("cafeList");
-  // 카페 테이블의 데이터 불러오는 쿼리(LIMIT 10)
+  const searchParam = "%" + req.query.region + "%";
+  const cafeList = await mysql.query("cafeList", searchParam);
+  // 조회 조건에 맞춰 카페 테이블의 데이터 불러오는 쿼리(LIMIT 10)
 
-  const cafeListKeyword = await mysql.query("cafeListKeyword");
-  // 카페 테이블 데이터와 연결된 다른 테이블의 데이터 불러오는 쿼리 (아래는 쿼리문)
-  // cafeListKeyword: `SELECT t1.cafe_id, t3.keyword_id, t3.keyword_name
-  // FROM cafe t1, cafe_keyword t2, keyword t3
-  // WHERE t1.cafe_id = t2.cafe_id and t2.keyword_id = t3.keyword_id`
-
-  // -> 연결된 테이블 정보 가져오는 두번째 쿼리는 LIMIT을 걸 수 없음
-  // (카페 데이터 하나 당 몇 개의 키워드 데이터가 join되었는지 모름)
-
-  const cafeListOpTime = await mysql.query("cafeListOpTime");
+  const cafeListKeyword = await mysql.query("cafeListKeyword", searchParam);
+  // 조회 조건에 맞춘 카페 데이터와 연결된 키워드만 호출
+  const cafeListOpTime = await mysql.query("cafeListOpTime", searchParam);
+  // 조회 조건에 맞춘 카페 데이터와 연결된 영업시간만 호출
 
   cafeList.forEach((cafe) => {
     const temp_id = cafe.cafe_id;
