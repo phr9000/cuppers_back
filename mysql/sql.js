@@ -57,10 +57,12 @@ module.exports = {
   reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
   FROM review t1, review_keyword t2, keyword t3
   WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
+  // USER 사용자
   userList: `select * FROM user`,
   userCreate: `insert into user set ?`,
   // keyword 연결된 커핑노트 새 글 있을 때 new : T 전달하도록 query 수정
   keywordLanding: `SELECT keyword_id, keyword_name, keyword_icon FROM keyword WHERE keyword_islanding=1`,
+  // CNOTE 커핑노트
   cnoteDetail: `SELECT *, 
   (
     SELECT COUNT(*) 
