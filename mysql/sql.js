@@ -30,6 +30,13 @@ module.exports = {
       LIMIT 10) as t)`,
   cafeDetail: `SELECT *,
   (
+    SELECT review_id
+    FROM review
+    WHERE cafe_id = ?
+    ORDER BY created_at DESC
+    LIMIT 1
+    ) as recent_review_id,
+  (
     SELECT COUNT(*) 
     FROM user_cafe_likeit t2
     WHERE t2.cafe_id = t1.cafe_id

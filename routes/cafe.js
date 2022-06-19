@@ -35,6 +35,7 @@ router.get("/:cafe_id", async (req, res) => {
   const user_id = req.query.user_id;
   // cafe 테이블의 데이터 호출
   const cafeDetail = await mysql.query("cafeDetail", [
+    cafe_id,
     user_id,
     cafe_id,
     user_id,
