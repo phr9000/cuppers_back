@@ -42,7 +42,16 @@ module.exports = {
     )
     THEN 1
     ELSE 0 END
-    ) as user_like
+    ) as user_like,
+    (
+      SELECT CASE WHEN EXISTS (
+        SELECT *
+        FROM user_cafe_beenthere
+        WHERE user_id = ? and cafe_id = ?
+    )
+    THEN 1
+    ELSE 0 END
+    ) as user_beenthere
   FROM cafe t1
   WHERE cafe_id = ?`,
   cafeDelete: ``,

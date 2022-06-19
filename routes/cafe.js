@@ -31,9 +31,12 @@ router.get("/", async (req, res) => {
 
 // [조회] cafe 상세페이지1 - cafe 기본 정보
 router.get("/:cafe_id", async (req, res) => {
-  const { cafe_id, user_id } = req.params;
+  const { cafe_id } = req.params;
+  const user_id = req.query.user_id;
   // cafe 테이블의 데이터 호출
   const cafeDetail = await mysql.query("cafeDetail", [
+    user_id,
+    cafe_id,
     user_id,
     cafe_id,
     cafe_id,
