@@ -18,13 +18,9 @@ router.get("/", async (req, res) => {
     cafe.cafe_keyword = cafeListKeyword.filter(
       (obj) => obj.cafe_id === temp_id
     );
-  });
-  // 카페 object 내에 키워드 object들을 배열로 추가
-
-  cafeList.forEach((cafe) => {
-    const temp_id = cafe.cafe_id;
     cafe.cafe_opTime = cafeListOpTime.filter((obj) => obj.cafe_id === temp_id);
   });
+  // 카페 object 내에 키워드, 영업시간 object들을 배열로 추가
 
   res.send(cafeList);
 });
