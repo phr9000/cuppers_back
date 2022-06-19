@@ -33,7 +33,16 @@ module.exports = {
     SELECT COUNT(*) 
     FROM user_cafe_likeit t2
     WHERE t2.cafe_id = t1.cafe_id
-    ) as likeit
+    ) as likeit,
+    (
+      SELECT CASE WHEN EXISTS (
+        SELECT *
+        FROM user_cafe_likeit
+        WHERE user_id = ? and cafe_id = ?
+    )
+    THEN 1
+    ELSE 0 END
+    ) as user_like
   FROM cafe t1
   WHERE cafe_id = ?`,
   cafeDelete: ``,
