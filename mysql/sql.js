@@ -4,12 +4,12 @@ module.exports = {
     SELECT COUNT(*) 
     FROM user_cafe_likeit t2
     WHERE t2.cafe_id = t1.cafe_id
-    ) as likeit,
+    ) as like_cnt,
     (
       SELECT COUNT(*) 
     FROM review t3
     WHERE t3.cafe_id = t1.cafe_id
-    ) as reviews
+    ) as review_cnt
   FROM cafe t1
   WHERE cafe_region LIKE ? 
   LIMIT 10`,
@@ -40,7 +40,7 @@ module.exports = {
     SELECT COUNT(*) 
     FROM user_cafe_likeit t2
     WHERE t2.cafe_id = t1.cafe_id
-    ) as likeit,
+    ) as like_cnt,
     (
       SELECT CASE WHEN EXISTS (
         SELECT *
@@ -81,17 +81,30 @@ module.exports = {
   cafeFacility: `SELECT t3.facility_name as name, t3.facility_icon as icon, t3.facility_type as type
   FROM cafe t1, cafe_facility t2, facility t3
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.facility_id = t3.facility_id`,
+  // Review 관련
   cafeReview: `SELECT t1.*, t2.user_nickname, 
   (
     SELECT COUNT(*) 
     FROM user_review_likeit t3
     WHERE t3.review_id = t1.review_id
-    ) as likeit 
+    ) as like_cnt,
+    (
+      SELECT CASE WHEN EXISTS (
+        SELECT *
+        FROM user_review_likeit
+        WHERE user_id = ? and review_id = t1.review_id
+    )
+    THEN 1
+    ELSE 0 END
+    ) as user_like 
   FROM review t1, user t2
   WHERE t1.cafe_id = ? and t1.user_id = t2.user_id`,
   reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
   FROM review t1, review_keyword t2, keyword t3
   WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
+  reviewImage: `SELECT t1.*
+  FROM images_review t1, review t2
+  WHERE t2.cafe_id = ? and t1.review_id = t2.review_id`,
   // USER 사용자
   userList: `select * FROM user`,
   userCreate: `insert into user set ?`,
