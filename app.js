@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config({ path: "mysql/.env" });
 const mysql = require("./mysql");
+const cors = require("cors");
 
 app.use(
   express.json({
@@ -9,10 +10,12 @@ app.use(
   })
 );
 
-// app.get("/api/cafe", async (req, res) => {
-//   const cafeList = await mysql.query("cafeList");
-//   res.send(cafeList);
-// });
+const corsOptions = {
+  origin: "http://localhost:9000", // 허용할 도메인 설정
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 const cafeRoutes = require("./routes/cafe");
 app.use("/api/cafe", cafeRoutes);
