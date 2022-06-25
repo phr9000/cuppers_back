@@ -9,7 +9,25 @@ module.exports = {
       SELECT COUNT(*) 
     FROM review t3
     WHERE t3.cafe_id = t1.cafe_id
-    ) as review_cnt
+    ) as review_cnt,
+    (
+      SELECT CASE WHEN EXISTS (
+        SELECT *
+        FROM user_cafe_likeit
+        WHERE user_id = ? and cafe_id = t1.cafe_id
+    )
+    THEN 1
+    ELSE 0 END
+    ) as user_liked,
+    (
+      SELECT CASE WHEN EXISTS (
+        SELECT *
+        FROM user_cafe_beenthere
+        WHERE user_id = ? and cafe_id = t1.cafe_id
+    )
+    THEN 1
+    ELSE 0 END
+    ) as user_beenthere
   FROM cafe t1
   WHERE cafe_region LIKE ? 
   LIMIT 10`,
@@ -38,9 +56,14 @@ module.exports = {
     ) as recent_review_id,
   (
     SELECT COUNT(*) 
-    FROM user_cafe_likeit t2
-    WHERE t2.cafe_id = t1.cafe_id
+    FROM user_cafe_likeit
+    WHERE cafe_id = ?
     ) as like_cnt,
+    (
+      SELECT COUNT(*) 
+      FROM review
+      WHERE cafe_id = ?
+      ) as review_cnt,
     (
       SELECT CASE WHEN EXISTS (
         SELECT *
@@ -49,7 +72,7 @@ module.exports = {
     )
     THEN 1
     ELSE 0 END
-    ) as user_like,
+    ) as user_liked,
     (
       SELECT CASE WHEN EXISTS (
         SELECT *
@@ -65,26 +88,31 @@ module.exports = {
   cafeImage: `SELECT t2.*
   FROM cafe t1, images_cafe t2
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id`,
-  cafeBrewingOption: `SELECT t3.brewing_name as name, t3.brewing_icon as icon 
-  FROM cafe t1, cafe_brewing_option t2, brewing_option t3
-  WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.brewing_option_id = t3.brewing_option_id`,
+  cafeBrewingOption: `SELECT t3.keyword_name as name, t3.keyword_icon as icon 
+  FROM cafe t1, cafe_keyword t2, keyword t3
+  WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.keyword_id = t3.keyword_id and t3.keyword_type = "brewing"`,
   cafeOpTime: `SELECT t2.operation_day as day, t2.operation_time as time
   FROM cafe t1, cafe_operation_time t2
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id`,
   // 활성 조건 추가해야 함
   cafeKeyword: `SELECT t3.keyword_name as name, t3.keyword_icon as icon
   FROM cafe t1, cafe_keyword t2, keyword t3
-  WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.keyword_id = t3.keyword_id`,
+  WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.keyword_id = t3.keyword_id and t3.keyword_type = "cafe"`,
   cafeMenu: `SELECT t2.*
   FROM cafe t1, menu t2
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id`,
   cafeFacility: `SELECT t3.facility_name as name, t3.facility_icon as icon, t3.facility_type as type
   FROM cafe t1, cafe_facility t2, facility t3
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.facility_id = t3.facility_id`,
+  cafeBranches: `SELECT cafe_id, cafe_name_pr
+  FROM cafe
+  WHERE headquater_id = ?`,
+  cafeCreate: `insert into cafe set ?`,
+
   // Review 관련
-  cafeReview: `SELECT t1.*, t2.user_nickname, 
+  cafeReview: `SELECT t1.*, t2.user_nickname,
   (
-    SELECT COUNT(*) 
+    SELECT COUNT(*)
     FROM user_review_likeit t3
     WHERE t3.review_id = t1.review_id
     ) as like_cnt,
@@ -96,20 +124,25 @@ module.exports = {
     )
     THEN 1
     ELSE 0 END
-    ) as user_like 
+    ) as user_like
   FROM review t1, user t2
-  WHERE t1.cafe_id = ? and t1.user_id = t2.user_id`,
+  WHERE t1.cafe_id = ? and t1.user_id = t2.user_id
+  ORDER BY like_cnt ASC`,
   reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
   FROM review t1, review_keyword t2, keyword t3
   WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
   reviewImage: `SELECT t1.*
   FROM images_review t1, review t2
   WHERE t2.cafe_id = ? and t1.review_id = t2.review_id`,
+
   // USER 사용자
   userList: `select * FROM user`,
   userCreate: `insert into user set ?`,
+
   // keyword 연결된 커핑노트 새 글 있을 때 new : T 전달하도록 query 수정
   keywordLanding: `SELECT keyword_id, keyword_name, keyword_icon FROM keyword WHERE keyword_islanding=1`,
+  keywordCreate: `insert into keyword set ?`,
+
   // CNOTE 커핑노트
   cnoteDetail: `SELECT *, 
   (
