@@ -8,4 +8,10 @@ router.get("/landing", async (req, res) => {
   res.send(keywordLanding);
 });
 
+// [생성] keyword 추가 api
+router.post("/", async (req, res) => {
+  const result = await mysql.query("keywordCreate", req.body.param);
+  res.send(result);
+});
+
 module.exports = router;
