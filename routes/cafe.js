@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
+const sql = require("../mysql/sql");
 const { cafeDetail } = require("../mysql/sql");
 
 // [조회] cafe 리스트
@@ -91,28 +92,80 @@ router.get("/image/:cafe_id", async (req, res) => {
   res.send(cafeImage);
 });
 
-// [생성] cafe 추가 api
-router.post("/", async (req, res) => {
-  const result = await mysql.query("cafeCreate", req.body.param);
-  res.send(result);
-});
-
-// [생성] 사용자리스트 생성 api
+// [생성] cafe 추가 api (test)
 // router.post("/", async (req, res) => {
-//   const result = await mysql.query("cafeCreate", req.body.param.cafe);
-//   const result = await mysql.query("cafeCreate", req.body.param.cafe);
-
+//   const result = await mysql.query("cafeCreate", req.body.param);
 //   res.send(result);
 // });
 
-// router.get("/update", async (req, res) => {
-//     const cafeList = await mysql.query("cafeList");
-//     res.send(cafeList);
-// });
+// [생성] cafe 추가 api
+router.post("/", async (req, res) => {
+  const conn = await mysql.getConnection();
+  await conn.beginTransaction();
 
-// app.get("/api/cafe", async (req, res) => {
-//     const cafeList = await mysql.query("cafeList");
-//     res.send(cafeList);
-//   });
+  conn.query(sql["cafeCreate"], req.body.cafe, async (err, rows, fields) => {
+    if (err) {
+      console.log(err);
+      await conn.rollback();
+      res.status(500).send({ err: err });
+    } else {
+      const cafe_id = rows.insertId;
+      console.log(rows);
+      const items1 = [];
+      const items2 = [];
+
+      for (const item of req.body.images) {
+        items1.push([
+          cafe_id,
+          item.type,
+          item.cafe_image_url,
+          item.thumbnail_url,
+        ]);
+      }
+
+      for (const item of req.body.menus) {
+        items2.push([
+          cafe_id,
+          item.menu_name,
+          item.menu_price_hot,
+          item.menu_price_ice,
+          item.menu_type,
+          item.menu_aromanote,
+          item.is_signature,
+        ]);
+      }
+
+      // query에서 배열을 전달할 때는 또 배열로 감싸야..!!! 매우 중요 [items]
+      conn.query(
+        sql["cafeImageInsert"],
+        [items1],
+        async (err2, rows2, fields2) => {
+          if (err2) {
+            console.log(err2);
+            await conn.rollback();
+            res.status(500).send({ err: err2 });
+          } else {
+            conn.query(
+              sql["cafeMenuInsert"],
+              [items2],
+              async (err3, rows2, fields2) => {
+                if (err3) {
+                  console.log(err3);
+                  await conn.rollback();
+                  res.status(500).send({ err: err3 });
+                } else {
+                  await conn.commit();
+                  res.status(200).send(rows);
+                }
+              }
+            );
+          }
+
+          await conn.release();
+        }
+      );
+    }
+  });
+});
 
 module.exports = router;

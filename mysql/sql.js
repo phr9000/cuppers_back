@@ -108,9 +108,16 @@ module.exports = {
   FROM cafe
   WHERE headquater_id = ?`,
   cafeCreate: `insert into cafe set ?`,
+  cafeImageInsert: `insert into images_cafe (cafe_id, type, cafe_image_url, thumbnail_url) values ?`,
+  cafeMenuInsert: `insert into menu (cafe_id, menu_name,
+    menu_price_hot,
+    menu_price_ice,
+    menu_type,
+    menu_aromanote,
+    is_signature) values ?`,
 
   // Review 관련
-  cafeReview: `SELECT t1.*, t2.user_nickname,
+  cafeReview: `SELECT t1.*, t2.user_nickname, t2.user_thumbnail_url,
   (
     SELECT COUNT(*)
     FROM user_review_likeit t3
@@ -124,13 +131,13 @@ module.exports = {
     )
     THEN 1
     ELSE 0 END
-    ) as user_like
+    ) as user_liked
   FROM review t1, user t2
   WHERE t1.cafe_id = ? and t1.user_id = t2.user_id
   ORDER BY like_cnt ASC`,
   reviewKeyword: `SELECT t1.review_id, t3.keyword_id, t3.keyword_name as name, t3.keyword_icon as icon, t3.keyword_type as type
   FROM review t1, review_keyword t2, keyword t3
-  WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = 1`,
+  WHERE t1.cafe_id = ? and t1.review_id = t2.review_id and t2.keyword_id = t3.keyword_id and t3.is_active = "active"`,
   reviewImage: `SELECT t1.*
   FROM images_review t1, review t2
   WHERE t2.cafe_id = ? and t1.review_id = t2.review_id`,
