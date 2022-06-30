@@ -104,7 +104,7 @@ module.exports = {
   cafeFacility: `SELECT t3.facility_name as name, t3.facility_icon as icon, t3.facility_type as type
   FROM cafe t1, cafe_facility t2, facility t3
   WHERE t1.cafe_id = ? and t1.cafe_id = t2.cafe_id and t2.facility_id = t3.facility_id`,
-  cafeBranches: `SELECT cafe_id, cafe_name_pr
+  cafeBranches: `SELECT cafe_id, cafe_name_pr, cafe_branch_name
   FROM cafe
   WHERE headquater_id = ?`,
   cafeCreate: `insert into cafe set ?`,
