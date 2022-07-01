@@ -56,4 +56,49 @@ router.post("/", async (req, res) => {
   res.send(cnoteCafeCreate);
 });
 
+// transaction 참고
+// router.post("/", async (req, res) => {
+//   const conn = await mysql.getConnection();
+//   await conn.beginTransaction();
+
+//   conn.query(sql["cafeCreate"], req.body.cafe, async (err, rows, fields) => {
+//     if (err) {
+//       console.log(err);
+//       await conn.rollback();
+//       res.status(500).send({ err: err });
+//     } else {
+//       const cafe_id = rows.insertId;
+//       console.log(rows);
+//       const items = [];
+
+//       for (const item of req.body.images) {
+//         items.push([
+//           cafe_id,
+//           item.type,
+//           item.cafe_image_url,
+//           item.thumbnail_url,
+//         ]);
+//       }
+
+//       // query에서 배열을 전달할 때는 또 배열로 감싸야..!!! 매우 중요 [items]
+//       conn.query(
+//         sql["cafeImageInsert"],
+//         [items],
+//         async (err2, rows2, fields2) => {
+//           if (err2) {
+//             console.log(err2);
+//             await conn.rollback();
+//             res.status(500).send({ err: err2 });
+//           } else {
+//             await conn.commit();
+//             res.status(200).send(rows);
+//           }
+
+//           await conn.release();
+//         }
+//       );
+//     }
+//   });
+// });
+
 module.exports = router;
