@@ -34,7 +34,6 @@ const imageUpload = multer({ storage: imageStorage });
 
 app.post("/api/upload/image", imageUpload.single("image"), async (req, res) => {
   const fileInfo = {
-    product_id: parseInt(req.body.product_id),
     originalname: req.file.originalname,
     mimetype: req.file.mimetype,
     filename: req.file.filename,
