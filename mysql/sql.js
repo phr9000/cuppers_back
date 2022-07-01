@@ -1,4 +1,5 @@
 module.exports = {
+  // cafe 관련
   cafeList: `SELECT t1.cafe_id, t1.cafe_name_pr, t1.cafe_address, t1.cafe_region, t1.cafe_latitude, t1.cafe_longitude, t1.cafe_description, t1.cafe_type, t1.cafe_img, 
   (
     SELECT COUNT(*) 
@@ -107,6 +108,7 @@ module.exports = {
   cafeBranches: `SELECT cafe_id, cafe_name_pr
   FROM cafe
   WHERE headquater_id = ?`,
+  // cafe 등록 관련
   cafeCreate: `insert into cafe set ?`,
   cafeImageInsert: `insert into images_cafe (cafe_id, type, cafe_image_url, thumbnail_url) values ?`,
   cafeMenuInsert: `insert into menu (cafe_id, menu_name,
