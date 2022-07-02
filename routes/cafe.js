@@ -7,11 +7,26 @@ const { cafeDetail } = require("../mysql/sql");
 // [조회] cafe 리스트
 router.get("/", async (req, res) => {
   const user_id = req.query.user;
-  const searchParam = "%" + req.query.region + "%";
+  const searchParam = "%" + req.query.search + "%";
+  const minLat = req.query.lat_min;
+  const maxLat = req.query.lat_max;
+  const minLong = req.query.long_min;
+  const maxLong = req.query.long_max;
+  const curLat = req.query.current_lat;
+  const curLong = req.query.current_long;
+
   const cafeList = await mysql.query("cafeList", [
+    Number(curLat),
+    Number(curLong),
     user_id,
     user_id,
     searchParam,
+    searchParam,
+    searchParam,
+    minLat,
+    maxLat,
+    minLong,
+    maxLong,
   ]);
   // 조회 조건에 맞춰 카페 테이블의 데이터 불러오는 쿼리(LIMIT 10)
 

@@ -1,6 +1,8 @@
 module.exports = {
   // cafe 관련
-  cafeList: `SELECT t1.cafe_id, t1.cafe_name_pr, t1.cafe_address, t1.cafe_region, t1.cafe_latitude, t1.cafe_longitude, t1.cafe_description, t1.cafe_type, t1.cafe_img, 
+  cafeList: `SELECT t1.cafe_id, t1.cafe_name_pr, t1.cafe_address, t1.cafe_region, t1.cafe_latitude, 
+  t1.cafe_longitude, t1.cafe_description, t1.cafe_type, t1.cafe_img, 
+  (POWER((? - t1.cafe_latitude), 2) + POWER((? - t1.cafe_longitude), 2)) as distance,
   (
     SELECT COUNT(*) 
     FROM user_cafe_likeit t2
@@ -30,7 +32,8 @@ module.exports = {
     ELSE 0 END
     ) as user_beenthere
   FROM cafe t1
-  WHERE cafe_region LIKE ? 
+  WHERE (cafe_name_pr LIKE ? or cafe_address LIKE ? or cafe_region LIKE ?)
+  and (cafe_latitude > ? and cafe_latitude < ? and cafe_longitude > ? and cafe_longitude < ?) 
   LIMIT 10`,
   cafeListKeyword: `SELECT t1.cafe_id, t2.keyword_id, t2.keyword_name
   FROM cafe_keyword t1, keyword t2
