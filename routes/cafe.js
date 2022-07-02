@@ -71,15 +71,9 @@ router.get("/:cafe_id", async (req, res) => {
 
   const cafeKeyword = await mysql.query("cafeKeyword", cafe_id);
 
-  const cafeMenu = await mysql.query("cafeMenu", cafe_id);
-
-  const cafeFacility = await mysql.query("cafeFacility", cafe_id);
-
   cafeDetail[0].brewingOption = cafeBrewingOption;
   cafeDetail[0].opTime = cafeOpTime;
   cafeDetail[0].keywords = cafeKeyword;
-  cafeDetail[0].menu = cafeMenu;
-  cafeDetail[0].facility = cafeFacility;
 
   res.send(cafeDetail[0]);
 });
@@ -90,6 +84,20 @@ router.get("/image/:cafe_id", async (req, res) => {
   const cafeImage = await mysql.query("cafeImage", cafe_id);
 
   res.send(cafeImage);
+});
+
+// [조회] cafe 상세페이지3 - menu, facility
+router.get("/info/:cafe_id", async (req, res) => {
+  const { cafe_id } = req.params;
+  const cafeInfo = {};
+
+  const cafeMenu = await mysql.query("cafeMenu", cafe_id);
+  const cafeFacility = await mysql.query("cafeFacility", cafe_id);
+
+  cafeInfo.cafeMenu = cafeMenu;
+  cafeInfo.cafeFacility = cafeFacility;
+
+  res.send(cafeInfo);
 });
 
 // [생성] cafe 추가 api (test)
