@@ -175,5 +175,5 @@ module.exports = {
   myListCafeName: `SELECT t2.cafe_id, t2.cafe_name_pr FROM cafe t2 WHERE t2.cafe_id in (SELECT t1.cafe_id FROM mylist_cafe t1 where t1.mylist_id = ?)`,
   cnoteCreate: `insert into cnote set ?`,
   cnoteCafeInsert: `insert into cnote_cafe (cnote_id, cafe_id, cnote_cafe_content) values ?`,
-  cnoteImageInsert: `inset into images_cafe (cnote_id, images_cnote_url) values ?`,
+  cnoteImageInsert: `insert into images_cnote (cnote_id, images_cnote_url) values ?`,
 };

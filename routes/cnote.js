@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
+const sql = require("../mysql/sql");
 
 // [조회] 커핑노트 내부 호출하는 api 1
 router.get("/detail/:cnote_id", async (req, res) => {
