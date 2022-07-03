@@ -47,6 +47,9 @@ module.exports = {
   cafeListOpTime: `SELECT cafe_id, operation_day as day, operation_time as time
    FROM cafe_operation_time
    WHERE cafe_id in (?)`,
+  cafeCnt: `SELECT COUNT(cafe_id) as totalCnt FROM cafe 
+  WHERE (cafe_name_pr LIKE ? or cafe_address LIKE ? or cafe_region LIKE ?)
+  and (cafe_latitude > ? and cafe_latitude < ? and cafe_longitude > ? and cafe_longitude < ?)`,
   cafeDetail: `SELECT *,
   (
     SELECT review_id
@@ -117,6 +120,9 @@ module.exports = {
     menu_type,
     menu_aromanote,
     is_signature) values ?`,
+  // My List 관련
+  myListAll: `SELECT * FROM mylist WHERE user_id = ?`,
+  myListOne: `SELECT * FROM mylist_cafe WHERE mylist_id = ?`,
 
   // Review 관련
   cafeReview: `SELECT t1.*, t2.user_nickname, t2.user_thumbnail_url,

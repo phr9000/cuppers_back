@@ -7,10 +7,28 @@ const sql = require("../mysql/sql");
 router.get("/", async (req, res) => {
   const user_id = req.query.user;
   const searchParam = "%" + req.query.search + "%";
-  const minLat = Number(req.query.lat_min);
-  const maxLat = Number(req.query.lat_max);
-  const minLong = Number(req.query.long_min);
-  const maxLong = Number(req.query.long_max);
+  let minLat = 0;
+  let maxLat = 0;
+  let minLong = 0;
+  let maxLong = 0;
+  // 지도의 한계좌표가 빈값으로 왔을 때 한반도 전체를 범위로 지정
+  if (
+    req.query.lat_min +
+      req.query.lat_max +
+      req.query.long_min +
+      req.query.long_max ===
+    ""
+  ) {
+    minLat = 30;
+    maxLat = 45;
+    minLong = 120;
+    maxLong = 135;
+  } else {
+    minLat = Number(req.query.lat_min);
+    maxLat = Number(req.query.lat_max);
+    minLong = Number(req.query.long_min);
+    maxLong = Number(req.query.long_max);
+  }
   const curLat = Number(req.query.current_lat);
   const curLong = Number(req.query.current_long);
   const order = req.query.order;
@@ -44,6 +62,10 @@ router.get("/", async (req, res) => {
       limit,
     ])
     .then(async (cafeList) => {
+      if (cafeList.length === 0) {
+        return cafeList;
+      }
+
       const ids = [];
       cafeList.forEach((item) => {
         ids.push(item.cafe_id);
@@ -59,10 +81,26 @@ router.get("/", async (req, res) => {
         );
         cafe.opTime = cafeListOpTime.filter((obj) => obj.cafe_id === temp_id);
       });
+
       return cafeList;
     });
 
-  res.send(cafeList);
+  // pagination 작업 위한 총개수 가져오기
+  const cafeCnt = await mysql.query("cafeCnt", [
+    searchParam,
+    searchParam,
+    searchParam,
+    minLat,
+    maxLat,
+    minLong,
+    maxLong,
+  ]);
+
+  result = {};
+  result.totalCnt = cafeCnt[0].totalCnt;
+  result.arr = cafeList;
+
+  res.send(result);
 });
 
 // [조회] cafe 상세페이지1 - cafe 기본 정보
@@ -209,6 +247,35 @@ router.post("/", async (req, res) => {
       );
     }
   });
+});
+
+// [조회] My list 가져오기
+router.get("/mylist/all/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  const myLists = await mysql.query("myListAll", user_id);
+
+  res.send(myLists);
+});
+
+// [조회] 특정 My list의 cafes 가져오기
+router.get("/mylist/one/:mylist_id", async (req, res) => {
+  const { mylist_id } = req.params;
+  const myList = await mysql.query("myListOne", mylist_id);
+
+  res.send(myList);
+});
+
+router.get("/info/:cafe_id", async (req, res) => {
+  const { cafe_id } = req.params;
+  const cafeInfo = {};
+
+  const cafeMenu = await mysql.query("cafeMenu", cafe_id);
+  const cafeFacility = await mysql.query("cafeFacility", cafe_id);
+
+  cafeInfo.cafeMenu = cafeMenu;
+  cafeInfo.cafeFacility = cafeFacility;
+
+  res.send(cafeInfo);
 });
 
 module.exports = router;
