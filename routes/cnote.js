@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
+const sql = require("../mysql/sql");
 
 // [조회] 커핑노트 내부 호출하는 api 1
 router.get("/detail/:cnote_id", async (req, res) => {
@@ -45,60 +46,61 @@ router.get("/mylistcafename/:mylist_id", async (req, res) => {
 });
 
 // [생성] cnote 테이블에 일반정보 저장 api
-router.post("/", async (req, res) => {
-  const cnoteCreate = await mysql.query("cnoteCreate", req.body.param);
-  res.send(cnoteCreate);
-});
-// [생성] cnote id 생성 동시에 cnote_cafe에 생성된 cnote_id, 받아온 카페 id 저장 api
-// TODO: 6/18 실제로 되는지는 프론트에서 params 라우터에 넘겨서 확인해야 됨!
-router.post("/", async (req, res) => {
-  const cnoteCafeCreate = await mysql.query("cnoteCafeCreate", req.body.param);
-  res.send(cnoteCafeCreate);
-});
 
 // transaction 참고
-// router.post("/", async (req, res) => {
-//   const conn = await mysql.getConnection();
-//   await conn.beginTransaction();
+router.post("/", async (req, res) => {
+  const conn = await mysql.getConnection();
+  await conn.beginTransaction();
 
-//   conn.query(sql["cafeCreate"], req.body.cafe, async (err, rows, fields) => {
-//     if (err) {
-//       console.log(err);
-//       await conn.rollback();
-//       res.status(500).send({ err: err });
-//     } else {
-//       const cafe_id = rows.insertId;
-//       console.log(rows);
-//       const items = [];
+  conn.query(sql["cnoteCreate"], req.body.cnote, async (err, rows, fields) => {
+    if (err) {
+      console.log(err);
+      await conn.rollback();
+      res.status(500).send({ err: err });
+    } else {
+      const cnote_id = rows.insertId;
+      console.log(rows);
+      const items1 = [];
+      const items2 = [];
 
-//       for (const item of req.body.images) {
-//         items.push([
-//           cafe_id,
-//           item.type,
-//           item.cafe_image_url,
-//           item.thumbnail_url,
-//         ]);
-//       }
+      for (const item of req.body.cafeids) {
+        items1.push([cnote_id, item.cafe_id, item.cnote_cafe_content]);
+      }
+      for (const item of req.body.images) {
+        items2.push([cnote_id, item.images_cnote_url]);
+      }
 
-//       // query에서 배열을 전달할 때는 또 배열로 감싸야..!!! 매우 중요 [items]
-//       conn.query(
-//         sql["cafeImageInsert"],
-//         [items],
-//         async (err2, rows2, fields2) => {
-//           if (err2) {
-//             console.log(err2);
-//             await conn.rollback();
-//             res.status(500).send({ err: err2 });
-//           } else {
-//             await conn.commit();
-//             res.status(200).send(rows);
-//           }
+      // query에서 배열을 전달할 때는 또 배열로 감싸야..!!! 매우 중요 [items]
+      conn.query(
+        sql["cnoteCafeInsert"],
+        [items1],
+        async (err2, rows2, fields2) => {
+          if (err2) {
+            console.log(err2);
+            await conn.rollback();
+            res.status(500).send({ err: err2 });
+          } else {
+            conn.query(
+              sql["cnoteImageInsert"],
+              [items2],
+              async (err3, rows2, fields2) => {
+                if (err3) {
+                  console.log(err3);
+                  await conn.rollback();
+                  res.status(500).send({ err: err3 });
+                } else {
+                  await conn.commit();
+                  res.status(200).send(rows);
+                }
+              }
+            );
+          }
 
-//           await conn.release();
-//         }
-//       );
-//     }
-//   });
-// });
+          await conn.release();
+        }
+      );
+    }
+  });
+});
 
 module.exports = router;

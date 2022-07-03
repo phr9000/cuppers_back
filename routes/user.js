@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
+// const sql = require("../mysql/sql");
 
 // [조회] 사용자리스트 조회 api
 router.get("/", async (req, res) => {
