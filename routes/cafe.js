@@ -2,45 +2,65 @@ const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql");
 const sql = require("../mysql/sql");
-const { cafeDetail } = require("../mysql/sql");
 
 // [조회] cafe 리스트
 router.get("/", async (req, res) => {
   const user_id = req.query.user;
   const searchParam = "%" + req.query.search + "%";
-  const minLat = req.query.lat_min;
-  const maxLat = req.query.lat_max;
-  const minLong = req.query.long_min;
-  const maxLong = req.query.long_max;
-  const curLat = req.query.current_lat;
-  const curLong = req.query.current_long;
+  const minLat = Number(req.query.lat_min);
+  const maxLat = Number(req.query.lat_max);
+  const minLong = Number(req.query.long_min);
+  const maxLong = Number(req.query.long_max);
+  const curLat = Number(req.query.current_lat);
+  const curLong = Number(req.query.current_long);
+  const order = req.query.order;
+  const sort = req.query.sort;
+  const page = Number(req.query.page);
+  const limit = Number(req.query.limit);
 
-  const cafeList = await mysql.query("cafeList", [
-    Number(curLat),
-    Number(curLong),
-    user_id,
-    user_id,
-    searchParam,
-    searchParam,
-    searchParam,
-    minLat,
-    maxLat,
-    minLong,
-    maxLong,
-  ]);
-  // 조회 조건에 맞춰 카페 테이블의 데이터 불러오는 쿼리(LIMIT 10)
+  // 조회 조건에 맞춰 카페 테이블의 데이터 불러오는 쿼리
+  const cafeList = await mysql
+    .query("cafeList", [
+      curLat,
+      curLong,
+      user_id,
+      user_id,
+      searchParam,
+      searchParam,
+      searchParam,
+      minLat,
+      maxLat,
+      minLong,
+      maxLong,
+      order,
+      sort,
+      order,
+      sort,
+      order,
+      sort,
+      order,
+      sort,
+      limit * (page - 1),
+      limit,
+    ])
+    .then(async (cafeList) => {
+      const ids = [];
+      cafeList.forEach((item) => {
+        ids.push(item.cafe_id);
+      });
+      const cafeListOpTime = await mysql.query("cafeListOpTime", [ids]);
+      const cafeListKeyword = await mysql.query("cafeListKeyword", [ids]);
 
-  const cafeListKeyword = await mysql.query("cafeListKeyword", searchParam);
-  // 조회 조건에 맞춘 카페 데이터와 연결된 키워드만 호출
-  const cafeListOpTime = await mysql.query("cafeListOpTime", searchParam);
-  // 조회 조건에 맞춘 카페 데이터와 연결된 영업시간만 호출
-
-  cafeList.forEach((cafe) => {
-    const temp_id = cafe.cafe_id;
-    cafe.keywords = cafeListKeyword.filter((obj) => obj.cafe_id === temp_id);
-    cafe.opTime = cafeListOpTime.filter((obj) => obj.cafe_id === temp_id);
-  });
-  // 카페 object 내에 키워드, 영업시간 object들을 배열로 추가
+      // 카페 object 내에 키워드, 영업시간 object들을 배열로 추가
+      cafeList.forEach((cafe) => {
+        const temp_id = cafe.cafe_id;
+        cafe.keywords = cafeListKeyword.filter(
+          (obj) => obj.cafe_id === temp_id
+        );
+        cafe.opTime = cafeListOpTime.filter((obj) => obj.cafe_id === temp_id);
+      });
+      return cafeList;
+    });
 
   res.send(cafeList);
 });

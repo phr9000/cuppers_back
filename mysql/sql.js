@@ -34,22 +34,19 @@ module.exports = {
   FROM cafe t1
   WHERE (cafe_name_pr LIKE ? or cafe_address LIKE ? or cafe_region LIKE ?)
   and (cafe_latitude > ? and cafe_latitude < ? and cafe_longitude > ? and cafe_longitude < ?) 
-  LIMIT 10`,
+  ORDER BY 
+  (CASE WHEN ? = 'dist' and ? = 'd' THEN distance
+        WHEN ? = 'like' and ? = 'd' THEN like_cnt
+        WHEN ? = 'dist' and ? = 'a' THEN -distance
+        WHEN ? = 'like' and ? = 'a' THEN -like_cnt
+  END) DESC
+  LIMIT ?, ?`,
   cafeListKeyword: `SELECT t1.cafe_id, t2.keyword_id, t2.keyword_name
   FROM cafe_keyword t1, keyword t2
-  WHERE t1.cafe_id in (SELECT * FROM
-    (SELECT cafe_id
-    FROM cafe
-    WHERE cafe_region LIKE ?
-    LIMIT 10) as t)
-   and t1.keyword_id = t2.keyword_id`,
+  WHERE t1.cafe_id in (?) and t1.keyword_id = t2.keyword_id`,
   cafeListOpTime: `SELECT cafe_id, operation_day as day, operation_time as time
-  FROM cafe_operation_time
-  WHERE cafe_id in (SELECT * FROM
-    (SELECT cafe_id
-      FROM cafe
-      WHERE cafe_region LIKE ?
-      LIMIT 10) as t)`,
+   FROM cafe_operation_time
+   WHERE cafe_id in (?)`,
   cafeDetail: `SELECT *,
   (
     SELECT review_id
