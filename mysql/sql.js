@@ -174,5 +174,6 @@ module.exports = {
   myList: `SELECT t1.* from mylist t1 WHERE t1.user_id = ?`,
   myListCafeName: `SELECT t2.cafe_id, t2.cafe_name_pr FROM cafe t2 WHERE t2.cafe_id in (SELECT t1.cafe_id FROM mylist_cafe t1 where t1.mylist_id = ?)`,
   cnoteCreate: `insert into cnote set ?`,
-  cnoteCafeCreate: `insert into cnote_cafe set ?`,
+  cnoteCafeInsert: `insert into cnote_cafe (cnote_id, cafe_id, cnote_cafe_content) values ?`,
+  cnoteImageInsert: `inset into images_cafe (cnote_id, images_cnote_url) values ?`,
 };
