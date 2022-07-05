@@ -13,11 +13,15 @@ router.get("/", async (req, res) => {
   let maxLong = 0;
   // 지도의 한계좌표가 빈값으로 왔을 때 한반도 전체를 범위로 지정
   if (
-    req.query.lat_min +
-      req.query.lat_max +
-      req.query.long_min +
-      req.query.long_max ===
-    ""
+    !req.query.lat_min ||
+    !req.query.lat_max ||
+    !req.query.long_min ||
+    !req.query.long_max
+    // || req.query.lat_min +
+    //   req.query.lat_max +
+    //   req.query.long_min +
+    //   req.query.long_max ===
+    //   ""
   ) {
     minLat = 30;
     maxLat = 45;
@@ -50,7 +54,6 @@ router.get("/", async (req, res) => {
       maxLat,
       minLong,
       maxLong,
-      order,
       sort,
       order,
       sort,
@@ -58,6 +61,7 @@ router.get("/", async (req, res) => {
       sort,
       order,
       sort,
+      order,
       limit * (page - 1),
       limit,
     ])
